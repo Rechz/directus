@@ -1,0 +1,22 @@
+.searchbar{
+    display: flex;
+    input{
+        height: 2.5rem;
+        width: 35rem;
+        padding-inline: 0.5rem;
+        border-radius: 25px 0 0  25px;
+        background-color: transparent;
+        border: 1px solid rgba(128, 128, 128, 0.451);
+        color: white;
+    }
+    .search-icon{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 3rem;
+        background-color: rgba(128, 128, 128, 0.441);
+        height: 2.5rem;
+        border-radius: 0 25px 25px 0;
+        cursor: pointer;
+    }
+}
