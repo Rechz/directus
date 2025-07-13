@@ -13,34 +13,19 @@
     <div class="thumbnail" v-if="data">
         <client-only>
             <div v-for="item in data" :key="item.id" @click="goToTenant(item)" class="card">
-                <div class="card-image-container">
-                    <NuxtImg :src="img(item.thumbnail)" class="card-image" />
-                    <div class="play-button-container">
-                        <img src="@/assets/icons/play.svg" height="25" class="play-button" />
-                    </div>
-                </div>
-                <div class="card-details">
-                    <h3>{{ item.title }}</h3>
-                    <p class="tenant-name">{{ item.tenant.name }}</p>
-                    <p v-if="item?.event_type !== 'live'" class="time">{{ item?.date_created ? `Uploaded
-                        ${dayjs(item.date_created).fromNow()}` : '' }}</p>
-                    <div v-else style="display: flex; align-items: center; gap:5px">
-                        <img src="@/assets/icons/live.svg" height="15" />
-                        <p class="time" style="margin-bottom: 5px;">Live Now</p>
-                    </div>
-                    <!-- <p v-html="item.description"></p> -->
-                </div>
-                <div class="live-label" v-if="item?.event_type === 'live'">
-                    <div class="live-dot" style=""></div>
-                    <p class="live-text">Live</p>
-                </div>
+                <Thumbnail 
+                  @go-to-tenant="goToTenant" 
+                  :image="img(item.thumbnail)" 
+                  :title="item.title"  
+                  :item="item"     
+                  :tenantName="item.tenant.name"
+                  :eventType="item?.event_type" 
+                  :date="item?.date_created"
+                />
             </div>
         </client-only>
     </div>
-     <div v-if="searchTerm && data?.length === 0" style=" height: 40vh; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-        <img src="@/assets/icons/no-result.svg" height="80"/>
-        <h2 style="color:#2f2f31">No results found</h2>
-    </div>
+    <NoResults :condition="!!searchTerm && data?.length === 0"/>
 </template>
 
 <script setup lang="ts">

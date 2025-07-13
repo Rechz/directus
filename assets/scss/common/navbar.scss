@@ -1,0 +1,33 @@
+.navbar {
+  position: sticky;
+  top: 0;
+  right: 0;
+  padding: 1em 3em;
+  height: 3em;
+  z-index: 9999;
+  backdrop-filter: blur(1em) saturate(180%);
+  -webkit-backdrop-filter: blur(1em) saturate(180%);
+  background-color: #000000d7;
+  &-elements {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    &-left {
+      display: flex;
+      column-gap: 1em;
+      align-items: center;
+      .main-logo {
+        img {
+          height: 3em;
+        }
+        display: flex;
+        align-items: center;
+        column-gap: 0.5em;
+        cursor: pointer;
+      }
+    }
+    .tenant-logo {
+      height: 3em;
+    }
+  }
+}

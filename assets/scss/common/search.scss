@@ -1,0 +1,30 @@
+.searchbar {
+  display: flex;
+  input {
+    height: 3em;
+    width: 35em;
+    padding-inline: 0.5rem;
+    border-radius: .5em 0 0 .5em;
+    background-color: transparent;
+    border: 1px solid rgba(128, 128, 128, 0.451);
+    color: white;
+  }
+  .search-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    background-color: rgba(128, 128, 128, 0.441);
+    height: 2.5rem;
+    border-radius: 0 .5em .5em 0;
+    cursor: pointer;
+  }
+}
+.search-results {
+  height: 40vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
