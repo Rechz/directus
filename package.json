@@ -10,6 +10,7 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@directus/sdk": "^20.0.0",
     "@nuxt/icon": "1.15.0",
     "@nuxt/image": "1.10.0",
     "dayjs-nuxt": "2.1.11",

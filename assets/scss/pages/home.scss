@@ -3,27 +3,92 @@
   grid-template-columns: repeat(4, 1fr);
   column-gap: 1em;
   row-gap: 1em;
-  padding: 0 3rem 1rem;
+  padding: 0 3em 1em;
+  @media (max-width: 1250px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  @media (max-width: 950px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (max-width: 550px) {
+    grid-template-columns: repeat(1, 1fr);
+  }
   .card {
     position: relative;
     overflow: hidden;
-    box-shadow: 0 .3em 1em 0 rgba(45, 45, 47, 0.37);
-    backdrop-filter: blur(.8em);
-    -webkit-backdrop-filter: blur(.8em);
-    border-radius: .6em;
+    box-shadow: 0 0.3em 1em 0 rgba(45, 45, 47, 0.37);
+    backdrop-filter: blur(0.8em);
+    -webkit-backdrop-filter: blur(0.8em);
+    border-radius: 0.6em;
     box-shadow: 0 1em 3.5em 0 rgba(45, 45, 47, 0.37);
     border: 1px solid #2f2f31a6;
-    border-radius: .5em;
+    border-radius: 0.5em;
   }
 }
 p.time {
   margin-top: 2%;
   opacity: 0.3;
-  font-size: .75em;
+  font-size: 0.75em;
 }
-.search-result{
-  h2{
-    padding: 1rem 3rem 1rem;
+.search-result {
+  h2 {
+    padding: 1em 3em 1em;
     font-weight: 300;
+  }
+}
+.live-container {
+  position: relative;
+  .icon{
+    height: 1em;
+  }
+  .arrow{
+    height: 1em;
+    width: 1.2em;
+    border: 2px solid #544a4aa4;
+    border-radius: 50%;
+    background-color:  #5b5b5bbf;
+    position: absolute;
+    top: 50%;
+    &.left{
+      left: 0;
+      transform: translate(-50%, -50%);
+      padding: .5em .3em .5em .5em;
+    }
+    &.right{
+      right: 0;
+      transform: translate(50%, -50%);
+      padding: 0.5em 0 0.5em .7em;
+    }
+  }
+  .thumbnail {
+    grid-template-columns: repeat(5, 1fr);
+    border: 1px dashed rgba(155, 153, 153, 0.511);
+    border-radius: 1em;
+    padding: 1.2em;
+  }
+  margin-inline: 3em;
+  margin-bottom: 1em;
+  .live-videos {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    h3 {
+      font-size: 1.2em;
+      margin-block: 0.5em;
+    }
+    .show-all-btn {
+      display: flex;
+      align-items: center;
+      gap: .5em;
+      background-color: #313131a4;
+      height: 25px;
+      padding: 0 0.6em;
+      border-radius: .3em;
+      font-size: .8em;
+      &:hover{
+        background-color: #808080a4;
+        cursor: pointer;
+      }
+    }
   }
 }

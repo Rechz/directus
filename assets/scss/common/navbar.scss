@@ -12,6 +12,11 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    .search-wrapper {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
     &-left {
       display: flex;
       column-gap: 1em;
@@ -30,4 +35,16 @@
       height: 3em;
     }
   }
+}
+@media screen and (max-width: 1350) {
+  .tenant-logo {
+    height: 2em;
+  }
+  .navbar-elements-left{
+ .main-logo {
+        img {
+          height: 2em;
+        }}
+  }
+ 
 }

@@ -3,11 +3,13 @@
     <div class="navbar-elements">
       <div class="navbar-elements-left">
         <div class="main-logo" @click="$router.push('/')">
-          <img :src="img(brand?.logo)"/>
+          <img :src="img(brand?.logo)" />
           <h2>{{ brand?.name }}</h2>
         </div>
       </div>
-      <slot name="search"></slot>
+      <div class="search-wrapper">
+        <slot name="search"></slot>
+      </div>
       <slot name="tenant"></slot>
     </div>
   </div>

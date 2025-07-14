@@ -3,20 +3,29 @@
   input {
     height: 3em;
     width: 35em;
-    padding-inline: 0.5rem;
-    border-radius: .5em 0 0 .5em;
+    padding-inline: 0.5em;
+    border-radius: 0.5em 0 0 0.5em;
     background-color: transparent;
     border: 1px solid rgba(128, 128, 128, 0.451);
     color: white;
+    @media (max-width: 1250px) {
+      width: 30em;
+    }
+    @media (max-width: 950px) {
+      width: 20em;
+    }
+    @media (max-width: 550px) {
+      width: 8em;
+    }
   }
   .search-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 3rem;
+    width: 3em;
     background-color: rgba(128, 128, 128, 0.441);
-    height: 2.5rem;
-    border-radius: 0 .5em .5em 0;
+    height: 2.5em;
+    border-radius: 0 0.5em 0.5em 0;
     cursor: pointer;
   }
 }
