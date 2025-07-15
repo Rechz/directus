@@ -43,8 +43,8 @@ const tenantName = ref('')
 onMounted(() => {
     tenant.value = sessionStorage.getItem('tenantId') || ''
     logo.value = sessionStorage.getItem('logo') || ''
-    tenantName.value = route.query.tenant
-    searchTerm.value = route.query.search || ''
+    tenantName.value = route.query.tenant as string ||''
+    searchTerm.value = route.query.search as string || ''
     fetchData();
 })
 function search(){

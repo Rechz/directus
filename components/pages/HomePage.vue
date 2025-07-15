@@ -105,10 +105,15 @@ const count = async () => {
     aggregate("videos", {
       aggregate: { count: "*" },
       groupBy: ["event_type"],
+      ...(searchTerm.value ? {
+        query: {
+          search: searchTerm.value
+        }
+      } : {})
     }
     ))
   const liveObj = res.find(item => item.event_type === "live");
-  liveCount.value = liveObj ? liveObj.count : 0;
+  liveCount.value = liveObj ? Number(liveObj.count) : 0;
 }
 const totalPages = computed(() => {
   return Math.ceil(liveCount.value / limit);
@@ -144,21 +149,7 @@ async function search() {
   searchName.value = searchTerm.value;
   isSearch.value = true;
   offset.value = 0;
-  const res = await getItems({
-    collection: 'videos',
-    params: {
-      aggregate: {
-        count: ['*']
-      },
-      ...(searchTerm.value ? { search: searchTerm.value } : {}),
-      filter: {
-        event_type: {
-          _eq: 'live',
-        }
-      }
-    }
-  })
-  liveCount.value = res[0].count
+  count();
   fetchData();
   fetchLiveData();
 }
