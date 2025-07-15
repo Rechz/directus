@@ -15,13 +15,14 @@
           <img src="@/assets/icons/play.svg" class="play-button" />
         </div>
       </div>
-      <iframe v-else :src="embedUrl(selectedVideo.video_url)" class="thumbnail-video" frameborder="0"
-        allow="autoplay; encrypted-media" allowfullscreen></iframe>
-      <div class="live-label" v-if="selectedVideo?.event_type === 'live'">
-        <div class="live-dot" style=""></div>
-        <p class="live-text">Live</p>
+      <div class="image-video" v-else>
+        <iframe  :src="embedUrl(selectedVideo.video_url)" class="thumbnail-video" frameborder="0"
+          allow="autoplay; encrypted-media" allowfullscreen></iframe>
       </div>
-
+      <div class="live-label" v-if="selectedVideo?.event_type === 'live'">
+          <div class="live-dot" style=""></div>
+          <p class="live-text">Live</p>
+        </div>
     </div>
     <div class="main-video-description-container">
       <h2>{{ selectedVideo.title }}</h2>
@@ -34,8 +35,7 @@
           <img src="@/assets/icons/live.svg" height="15" />
           <p class="time" style="margin-bottom: 5px;">Live Now</p>
         </div>
-        <div class="desc" ref="descRef"
-          v-html="selectedVideo?.description"></div>
+        <div class="desc" ref="descRef" v-html="selectedVideo?.description"></div>
         <!-- <button v-if="isOverflow" @click="toggle" class="read-more-btn">
           {{ isExpanded ? "Show less" : "Read more" }}
         </button> -->

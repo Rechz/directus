@@ -1,0 +1,27 @@
+#loader{
+  height:80px;
+  width:80px;
+  position:relative;
+}[l]{
+  position:absolute;
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  animation:loader 1s linear infinite;
+}
+[a]{left:35px;}
+[b]{right:10px;top:10px;animation-delay:.1s}
+[c]{top:35px;right:0;animation-delay:.2s}
+[d]{right:10px;bottom:10px;animation-delay:.3s}
+[e]{left:35px;bottom:0;animation-delay:.4s}
+[f]{left:10px;bottom:10px;animation-delay:.6s}
+[g]{top:35px;left:0;animation-delay:.8s}
+[h]{left:10px;top:10px;animation-delay:.9s}
+@keyframes loader{
+  0%{
+    background:#fff;
+  }
+  100%{
+    background:#0000;
+  }
+}

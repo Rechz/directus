@@ -10,7 +10,7 @@
     <div v-if="searchTerm" class="search-result">
         <h2>Showing search results for '<em>{{ route.query.search }}</em>'</h2>
     </div>
-    <div class="thumbnail" v-if="data">
+    <div class="thumbnail search-container" v-if="data">
         <client-only>
             <div v-for="item in data" :key="item.id" @click="goToTenant(item)" class="card">
                 <Thumbnail 

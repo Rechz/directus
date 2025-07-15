@@ -25,9 +25,10 @@
           overflow: hidden;
           padding: 0;
           font-weight: 300;
+          font-size: 1em;
         }
         .html-description{
-          height: 3em;
+          height: 2.5em;
           overflow: hidden;
         }
         .html-description p {
@@ -39,6 +40,7 @@
           -webkit-box-orient: vertical;
           overflow: hidden;
           font-weight: 100;
+          font-size: .9em;
         }
         p.time {
           margin-top: 2%;
@@ -47,7 +49,7 @@
         }
       }
       .image-container {
-        height: 8em;
+        height: 7em;
         aspect-ratio: 16/9;
         width: 100%;
         overflow: hidden;

@@ -7,14 +7,17 @@
   <div v-if="searchTerm && isSearch" class="search-result">
     <h2>Showing search results for '<em>{{ searchName }}</em>'</h2>
   </div>
-
-  <div v-if="liveVideos?.length>0" class="live-container">
+  <div v-if="liveVideos?.length > 0" class="live-container">
     <div class="live-videos">
-      <h3>Live Videos</h3>
-        <div class="show-all-btn">
-          <img src="@/assets/icons/play.svg" height="10" class="play-button" /> 
-          Show all
-        </div>
+      <h3 class="container-name">Live Videos</h3>
+      <div class="show-all-btn" v-if="liveCount > liveVideos?.length && !isShowAllLive" @click="showAllLive()">
+        <img src="@/assets/icons/play.svg" height="10" class="play-button" />
+        Show all
+      </div>
+      <div class="show-all-btn" v-else-if="isShowAllLive" @click="showAllLive()">
+        <img src="@/assets/icons/play.svg" height="10" class="play-button" />
+        Hide all
+      </div>
     </div>
     <div v-if="liveVideos" class="thumbnail">
       <client-only>
@@ -23,22 +26,31 @@
             :tenantName="item.tenant.name" :eventType="item?.event_type" :date="item?.date_created" />
         </div>
       </client-only>
-    </div>
-    <div class="divider"></div>
-    <div class="arrow left">
-      <img src="~/assets/icons/left-arrow.svg" class="icon"/>
-    </div>
-     <div class="arrow right">
-      <img src="~/assets/icons/right-arrow.svg" class="icon"/>
-    </div>
-  </div>
-  <div v-if="data" class="thumbnail">
-    <client-only>
-      <div v-for="item in data" :key="item.id" class="card">
-        <Thumbnail @go-to-tenant="goToTenant" :item="item" :image="img(item.thumbnail)" :title="item.title"
-          :tenantName="item.tenant.name" :eventType="item?.event_type" :date="item?.date_created" />
+      <div v-if="offset > 0 && !isShowAllLive" class="arrow left" @click="prevPage()">
+        <img src="~/assets/icons/left-arrow.svg" class="icon" />
       </div>
-    </client-only>
+      <div class="arrow right" v-if="offset < (totalPages-1) && !isShowAllLive" @click="nextPage()">
+        <img src="~/assets/icons/right-arrow.svg" class="icon" />
+      </div>
+    </div>
+    <!-- <div class="divider"></div> -->
+  </div>
+  <div v-if="data?.length > 0" class="live-container other-videos-container">
+    <div class="live-videos">
+      <h3 class="container-name">Related Videos</h3>
+      <!-- <div class="show-all-btn">
+        <img src="@/assets/icons/play.svg" height="10" class="play-button" />
+        Show all
+      </div> -->
+    </div>
+    <div class="thumbnail other-videos">
+      <client-only>
+        <div v-for="item in data" :key="item.id" class="card">
+          <Thumbnail @go-to-tenant="goToTenant" :item="item" :image="img(item.thumbnail)" :title="item.title"
+            :tenantName="item.tenant.name" :eventType="item?.event_type" :date="item?.date_created" />
+        </div>
+      </client-only>
+    </div>
   </div>
   <NoResults :condition="!!searchTerm && data?.length === 0" />
 </template>
@@ -54,10 +66,12 @@ const router = useRouter();
 
 onMounted(() => {
   fetchData();
-  fetchLiveData()
+  fetchLiveData();
+  count();
 })
 const limit = 5;
-const page = ref(1);
+const offset = ref(0);
+const page = computed(() => Math.floor(offset.value / limit) + 1)
 const liveVideos: Ref<Record<string, any>[]> = ref([]);
 async function fetchLiveData() {
   const res: Record<string, any>[] = await getItems({
@@ -70,8 +84,8 @@ async function fetchLiveData() {
         'tenant.slug',
         'tenant.logo'
       ],
-      limit: limit,
-      page: page.value,
+      ...(!isShowAllLive.value ? { limit: limit } : {}),
+      ...(!isShowAllLive.value ? { offset: offset.value} : {}),
       ...(searchTerm.value ? { search: searchTerm.value } : {}),
       filter: {
         event_type: {
@@ -84,11 +98,21 @@ async function fetchLiveData() {
 }
 const { $directus } = useNuxtApp();
 import { aggregate } from '@directus/sdk';
-const agg = await $directus.request(
-  aggregate("videos", {
-    aggregate: { count: "*" },
-    groupBy: ["event_type"],
-  }))
+const liveCount = ref(0);
+const otherVideoCount = ref(0);
+const count = async () => {
+  const res = await $directus.request(
+    aggregate("videos", {
+      aggregate: { count: "*" },
+      groupBy: ["event_type"],
+    }
+    ))
+  const liveObj = res.find(item => item.event_type === "live");
+  liveCount.value = liveObj ? liveObj.count : 0;
+}
+const totalPages = computed(() => {
+  return Math.ceil(liveCount.value / limit);
+});
 const data: Ref<Record<string, any>[]> = ref([])
 async function fetchData() {
   const res: Record<string, any>[] = await getItems({
@@ -112,24 +136,55 @@ async function fetchData() {
   data.value = res
 }
 function goToTenant(item: any) {
-  sessionStorage.setItem('tenantId', item.tenant.id)
+  sessionStorage.setItem('tenantId', item.tenant.id);
   router.push({ path: item.tenant.slug, query: { video: item.id } });
 }
 const searchName = ref('')
-function search() {
-  searchName.value = searchTerm.value
+async function search() {
+  searchName.value = searchTerm.value;
   isSearch.value = true;
+  offset.value = 0;
+  const res = await getItems({
+    collection: 'videos',
+    params: {
+      aggregate: {
+        count: ['*']
+      },
+      ...(searchTerm.value ? { search: searchTerm.value } : {}),
+      filter: {
+        event_type: {
+          _eq: 'live',
+        }
+      }
+    }
+  })
+  liveCount.value = res[0].count
   fetchData();
   fetchLiveData();
 }
 watch(searchTerm, (newVal) => {
   if (newVal === '') {
-    searchName.value = ''
+    searchName.value = '';
     isSearch.value = false;
+    offset.value = 0;
+    count();
     fetchData();
     fetchLiveData();
   }
 })
-
-const { getThumbnail: img } = useDirectusFiles()
+function prevPage() {
+  offset.value--;
+  fetchLiveData();
+}
+function nextPage() {
+  offset.value++;
+  fetchLiveData();
+}
+const { getThumbnail: img } = useDirectusFiles();
+const isShowAllLive = ref(false);
+async function showAllLive() {
+  isShowAllLive.value = !isShowAllLive.value;
+  offset.value = 0;
+  fetchLiveData();
+}
 </script>
