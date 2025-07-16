@@ -16,24 +16,23 @@
         </div>
       </div>
       <div class="image-video" v-else>
-        <iframe  :src="embedUrl(selectedVideo.video_url)" class="thumbnail-video" frameborder="0"
+        <iframe :src="embedUrl(selectedVideo.video_url)" class="thumbnail-video" frameborder="0"
           allow="autoplay; encrypted-media" allowfullscreen></iframe>
       </div>
       <div class="live-label" v-if="selectedVideo?.event_type === 'live'">
-          <div class="live-dot" style=""></div>
-          <p class="live-text">Live</p>
-        </div>
+        <div class="live-dot" style=""></div>
+        <p class="live-text">Live</p>
+      </div>
     </div>
     <div class="main-video-description-container">
-      <h2>{{ selectedVideo.title }}</h2>
-      <!-- <p class="name">{{ selectedVideo?.tenant?.name }}</p> -->
       <div class="main-video-description">
+        <h2>{{ selectedVideo.title }}</h2>
         <p v-if="selectedVideo?.event_type !== 'live'" class="time">{{ selectedVideo?.date_created ? `Uploaded
           ${dayjs(selectedVideo.date_created).fromNow()}` : '' }}
         </p>
         <div v-else style="display: flex; align-items: center; gap:5px">
           <img src="@/assets/icons/live.svg" height="15" />
-          <p class="time" style="margin-bottom: 5px;">Live Now</p>
+          <p class="time" style="margin-bottom: .7em;">Live Now</p>
         </div>
         <div class="desc" ref="descRef" v-html="selectedVideo?.description"></div>
         <!-- <button v-if="isOverflow" @click="toggle" class="read-more-btn">
@@ -41,7 +40,6 @@
         </button> -->
       </div>
     </div>
-
   </div>
   <div class="related-videos-container">
     <h2>Related Videos</h2>
@@ -69,7 +67,6 @@
             <p class="time">Live Now</p>
           </div>
         </div>
-
       </div>
     </div>
     <div v-else class="no-videos">
@@ -81,13 +78,49 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-
 dayjs.extend(relativeTime)
+function getSubtitle() {
+  const subtitleWrapper = document.getElementById("subtitle-box-wrapper");
+  const subtitleBox = document.getElementById("subtitle-box");
+  let autoScroll = true;
+  subtitleWrapper.addEventListener('mouseenter', () => {
+    autoScroll = false;
+  });
+  subtitleWrapper.addEventListener('mouseleave', () => {
+    autoScroll = true;
+    scrollToBottom();
+  });
+  function scrollToBottom() {
+    subtitleWrapper.scrollTop = subtitleWrapper.scrollHeight;
+  }
+  window.addEventListener("message", function (event) {
+    console.log('origin', event.origin)
+    const allowedOrigins = [
+      "https://webcastalpha.vconsol.com"
+    ];
+    if (!allowedOrigins.includes(event.origin)) {
+      console.log('return')
+      return;
+    }
+    const data = event.data;
+    if (data && data.caption && data.caption.text && data.type === "video-caption") {
+      const captionText = data.caption.text;
+      if (captionText && typeof captionText === 'string') {
+        const p = document.createElement("p");
+        p.textContent = captionText;
+        subtitleBox.appendChild(p);
+        if (autoScroll) {
+          scrollToBottom();
+        }
+      }
+    }
+  });
+}
+const router = useRouter()
 function changeVideo(item: any) {
   sessionStorage.setItem('tenantId', item.tenant.id)
   router.push({ path: item.tenant.slug, query: { video: item.id } });
 }
-const router = useRouter()
 const searchTerm = ref('')
 function goToSearchResults() {
   router.push({ path: '/results', query: { search: searchTerm.value, tenant: tenantDetails.value[0].name } })
@@ -99,18 +132,17 @@ function embedUrl(url: string) {
   }
   return url
 }
-const descRef = ref(null);
+const descRef = ref<HTMLElement | null>(null);
 const isClicked = ref(false)
 const { getThumbnail: img } = useDirectusFiles()
 const tenant = ref<string>('')
 const { getItems } = useDirectusItems();
-const relatedVideos = ref<Record<string, any>[]>([])
+const relatedVideos = ref<Record<string, any>>({})
 const route = useRoute()
 const selectedVideo = ref<any>({})
 const tenantDetails = ref<Record<string, any>>({})
-const isExpanded = ref(false);
 const isOverflow = ref(false);
-
+const showSubtitle = ref(false);
 function checkOverflow() {
   const el = descRef.value
   if (!el) return
@@ -123,45 +155,50 @@ watch(() => selectedVideo.value.description, () => {
     checkOverflow()
   })
 })
-const toggle = () => {
-  isExpanded.value = !isExpanded.value;
-};
+const getTenant = async () => {
+  const res = await getItems({
+    collection: 'tenants',
+    params: {
+      filter: {
+        id: {
+          _eq: tenant.value
+        }
+      },
+      fields: ['name', 'logo']
+    }
+  })
+  return res
+}
+const getRelatedVideos = async () => {
+  const res = await getItems({
+    collection: 'videos',
+    params: {
+      fields: [
+        '*',
+        'tenant.id',
+        'tenant.name',
+        'tenant.slug',
+        'tenant.logo'
+      ],
+      filter: {
+        tenant: {
+          _eq: tenant.value
+        },
+        id: {
+          _neq: route.query.video
+        }
+      }
+    }
+  })
+  return res;
+}
 onMounted(async () => {
   tenant.value = sessionStorage.getItem('tenantId') || ''
   if (tenant.value) {
-    tenantDetails.value = await getItems({
-      collection: 'tenants',
-      params: {
-        filter: {
-          id: {
-            _eq: tenant.value
-          }
-        },
-        fields: ['name', 'logo']
-      }
-    })
+    tenantDetails.value = await getTenant();
     sessionStorage.setItem('logo', tenantDetails.value[0].logo)
-    relatedVideos.value = await getItems({
-      collection: 'videos',
-      params: {
-        fields: [
-          '*',
-          'tenant.id',
-          'tenant.name',
-          'tenant.slug',
-          'tenant.logo'
-        ],
-        filter: {
-          tenant: {
-            _eq: tenant.value
-          },
-          id: {
-            _neq: route.query.video
-          }
-        }
-      }
-    })
-    relatedVideos.value.sort((a, b) => {
+    relatedVideos.value = await getRelatedVideos();
+    relatedVideos.value.sort((a: any, b: any) => {
       if (a.event_type === 'live' && b.event_type !== 'live') {
         return -1
       }
@@ -192,6 +229,7 @@ onMounted(async () => {
     selectedVideo.value = res[0]
     const el = descRef.value;
   }
+  getSubtitle()
 })
 watch(
   () => route.query.video,
@@ -240,7 +278,7 @@ watch(
           }
         }
       })
-      relatedVideos.value.sort((a, b) => {
+      relatedVideos.value.sort((a: any, b: any) => {
         if (a.event_type === 'live' && b.event_type !== 'live') {
           return -1
         }
