@@ -19,6 +19,7 @@
     box-shadow: 0 0.3em 1em 0 rgba(45, 45, 47, 0.37);
     backdrop-filter: blur(0.8em);
     -webkit-backdrop-filter: blur(0.8em);
+    background-color: #28292a9c;
     border-radius: 0.6em;
     box-shadow: 0 1em 3.5em 0 rgba(45, 45, 47, 0.37);
     border: 1px solid #2f2f31a6;
@@ -31,8 +32,9 @@ p.time {
   font-size: 0.75em;
 }
 .search-result {
+  padding: 1em 3em;
   h2 {
-    padding: 1em 2em;
+    
     font-weight: 100;
     font-size: 1.2em;
   }
@@ -62,10 +64,10 @@ p.time {
   }
   .thumbnail:not(.other-videos) {
     position: relative;
-    grid-template-columns: repeat(5, 1fr);
-    border: 1px dashed rgba(155, 153, 153, 0.511);
+    grid-template-columns: repeat(6, 1fr);
+    // border: 1px dashed rgba(155, 153, 153, 0.511);
     border-radius: 1em;
-    padding: 1.2em;
+    // padding: 1.2em;
   }
   margin-inline: 3em;
   margin-bottom: 1em;

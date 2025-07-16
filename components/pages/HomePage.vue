@@ -69,7 +69,7 @@ onMounted(() => {
   fetchLiveData();
   count();
 })
-const limit = 5;
+const limit = 6;
 const offset = ref(0);
 const page = computed(() => Math.floor(offset.value / limit) + 1)
 const liveVideos: Ref<Record<string, any>[]> = ref([]);
