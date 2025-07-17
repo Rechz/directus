@@ -30,7 +30,7 @@ defineProps({
     item: Object,
     title: String,
     tenantName: String,
-    date: Date,
+    date: String,
     eventType: String,
     image: String
 })

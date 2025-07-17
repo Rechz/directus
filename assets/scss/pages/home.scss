@@ -34,32 +34,33 @@ p.time {
 .search-result {
   padding: 1em 3em;
   h2 {
-    
     font-weight: 100;
     font-size: 1.2em;
   }
 }
 .live-container {
-  .icon{
+  position: relative;
+  transition: all 1s ease-in-out;
+  .icon {
     height: 1em;
   }
-  .arrow{
+  .arrow {
     height: 1em;
     width: 1.2em;
     border: 2px solid #544a4aa4;
     border-radius: 50%;
-    background-color:  #5b5b5bbf;
+    background-color: #5b5b5bbf;
     position: absolute;
     top: 50%;
-    &.left{
+    &.left {
       left: 0;
       transform: translate(-50%, -50%);
-      padding: .5em .3em .5em .5em;
+      padding: 0.5em 0.3em 0.5em 0.5em;
     }
-    &.right{
+    &.right {
       right: 0;
       transform: translate(50%, -50%);
-      padding: 0.5em 0 0.5em .7em;
+      padding: 0.5em 0 0.5em 0.7em;
     }
   }
   .thumbnail:not(.other-videos) {
@@ -68,6 +69,12 @@ p.time {
     // border: 1px dashed rgba(155, 153, 153, 0.511);
     border-radius: 1em;
     // padding: 1.2em;
+    @media (max-width: 960px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    @media (max-width: 600px) {
+      grid-template-columns: repeat(1, 1fr);
+    }
   }
   margin-inline: 3em;
   margin-bottom: 1em;
@@ -75,30 +82,34 @@ p.time {
     display: flex;
     align-items: center;
     gap: 1em;
-    margin-top: 1em;
-    margin-bottom: 1.5em;
+    margin-block: 1em;
     h3.container-name {
       font-size: 1.2em;
       font-weight: 400;
     }
     .show-all-btn {
+      position: absolute;
+      top: calc(100% - 1em);
+      left: 50%;
+      transform: translateX(-50%);
       display: flex;
       align-items: center;
-      gap: .5em;
+      gap: 0.5em;
       background-color: #313131a4;
       height: 1.5em;
-      padding: .2em 0.6em;
-      border-radius: .3em;
-      font-size: .8em;
-      &:hover{
+      padding: 0.2em 0.6em;
+      border-radius: 0.3em;
+      font-size: 0.8em;
+      color: #989898;
+      &:hover {
         background-color: #808080a4;
         cursor: pointer;
       }
     }
   }
 }
-.other-videos-container{
-  h3.container-name{
-    margin-top: .5em;
+.other-videos-container {
+  h3.container-name {
+    margin-top: 0.5em;
   }
 }

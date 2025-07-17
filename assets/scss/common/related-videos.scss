@@ -1,68 +1,77 @@
 .video-list-container {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  column-gap: 1.25em;
+  row-gap: 1.25em;
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  @media (max-width: 700px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (max-width: 500px) {
+    grid-template-columns: repeat(1, 1fr);
+  }
+  .related-video {
+    position: relative;
+    width: 100%;
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    column-gap: 1.25em;
-    row-gap: 1.25em;
-    .related-video {
-      position: relative;
-      width: 100%;
-      display: grid;
-      grid-template-columns: 1fr;
-      background-color: #28292a9c;
-      box-shadow: 0 1em 3.5em 0 #2d2d2f5e;
-      min-height: 7.5em;
-      border: 1px solid #2f2f3181;
-      border-radius: 0.5em;
-      .details {
-        padding: .6em;
-        display: flex;
-        flex-direction: column;
-        // justify-content: space-between;
-        .video-title{
-          display: -webkit-box;
-          -webkit-line-clamp: 1;
-          line-clamp: 1;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-          padding: 0;
-          font-weight: 300;
-          font-size: 1em;
-        }
-        .html-description{
-          height: 2.5em;
-          overflow: hidden;
-        }
-        .html-description p {
-          color: #989898;
-          margin-top: .5em;
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          line-clamp: 2;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-          font-weight: 100;
-          font-size: .9em;
-        }
-        p.time {
-          margin-top: 2%;
-          opacity: 0.3;
-          font-size: .75em;
-        }
-      }
-      .image-container {
-        height: 7em;
-        aspect-ratio: 16/9;
-        width: 100%;
+    grid-template-columns: 1fr;
+    background-color: #28292a9c;
+    box-shadow: 0 1em 3.5em 0 #2d2d2f5e;
+    min-height: 7.5em;
+    border: 1px solid #2f2f3181;
+    border-radius: 0.5em;
+    .details {
+      padding: 0.6em;
+      display: flex;
+      flex-direction: column;
+      // justify-content: space-between;
+      .video-title {
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        line-clamp: 1;
+        -webkit-box-orient: vertical;
         overflow: hidden;
-        border-radius: .5em .5em 0 0;
-        position: relative;
-        .image {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          transition: transform 1s ease;
-        }
-        &:hover {
+        padding: 0;
+        font-weight: 300;
+        font-size: 1em;
+      }
+      .html-description {
+        height: 2.5em;
+        overflow: hidden;
+      }
+      .html-description p {
+        color: #989898;
+        margin-top: 0.5em;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        font-weight: 100;
+        font-size: 0.9em;
+      }
+      p.time {
+        margin-top: 2%;
+        opacity: 0.3;
+        font-size: 0.75em;
+      }
+    }
+    .image-container {
+      height: 7em;
+      aspect-ratio: 16/9;
+      width: 100%;
+      overflow: hidden;
+      border-radius: 0.5em 0.5em 0 0;
+      position: relative;
+      .image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 1s ease;
+      }
+      &:hover {
         .play-button-container {
           display: flex;
           opacity: 0.8;
@@ -71,19 +80,19 @@
           transform: scale(1.1);
         }
       }
-      } 
-    }
-    .no-videos {
-      p {
-        opacity: 0.7;
-        font-weight: 300;
-      }
     }
   }
-  .video-title{
-    display: -webkit-box;
-        -webkit-line-clamp: 1;
-        line-clamp: 1;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
+  .no-videos {
+    p {
+      opacity: 0.7;
+      font-weight: 300;
+    }
   }
+}
+.video-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

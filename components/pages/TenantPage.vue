@@ -16,8 +16,8 @@
         </div>
       </div>
       <div class="image-video" v-else>
-        <iframe :src="embedUrl(selectedVideo.video_url)" class="thumbnail-video" frameborder="0"
-          allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        <iframe :src="`${embedUrl(selectedVideo.video_url)}&captionPostToUrl=${hostLocation}`" class="thumbnail-video"
+          frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
       </div>
       <div class="live-label" v-if="selectedVideo?.event_type === 'live'">
         <div class="live-dot" style=""></div>
@@ -30,14 +30,24 @@
         <p v-if="selectedVideo?.event_type !== 'live'" class="time">{{ selectedVideo?.date_created ? `Uploaded
           ${dayjs(selectedVideo.date_created).fromNow()}` : '' }}
         </p>
-        <div v-else style="display: flex; align-items: center; gap:5px">
+        <div v-else class="live-now-text">
           <img src="@/assets/icons/live.svg" height="15" />
-          <p class="time" style="margin-bottom: .7em;">Live Now</p>
+          <p class="time">Live Now</p>
         </div>
-        <div class="desc" ref="descRef" v-html="selectedVideo?.description"></div>
-        <!-- <button v-if="isOverflow" @click="toggle" class="read-more-btn">
-          {{ isExpanded ? "Show less" : "Read more" }}
-        </button> -->
+        <div v-show="!showSubtitle">
+          <div class="desc" :class="{ 'show-subs': selectedVideo.subtitle_show && isClicked }" ref="descRef"
+            v-html="selectedVideo?.description"></div>
+        </div>
+        <div v-show="showSubtitle" id="subtitle-box-wrapper" class="desc"
+          :class="{ 'show-subs': selectedVideo.subtitle_show && isClicked }">
+          <div id="subtitle-box">
+          </div>
+        </div>
+        <div class="show-subtitle-button" v-if="selectedVideo.subtitle_show && isClicked"
+          @click="showSubtitle = !showSubtitle">
+          <span><img :src="!showSubtitle ? eyeIcon : eyeHideIcon" height="12" /></span>
+          {{ !showSubtitle ? 'Show' : 'Hide' }} Subtitles
+        </div>
       </div>
     </div>
   </div>
@@ -78,44 +88,83 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
+import eyeIcon from '~/assets/icons/eye.svg'
+import eyeHideIcon from '~/assets/icons/eye-hide.svg'
 dayjs.extend(relativeTime)
+// function getSubtitle() {
+//   const subtitleWrapper = document.getElementById("subtitle-box-wrapper");
+//   const subtitleBox = document.getElementById("subtitle-box");
+//   let autoScroll = true;
+//   subtitleWrapper.addEventListener('mouseenter', () => {
+//     autoScroll = false;
+//   });
+//   subtitleWrapper.addEventListener('mouseleave', () => {
+//     autoScroll = true;
+//     scrollToBottom();
+//   });
+//   function scrollToBottom() {
+//     subtitleWrapper.scrollTop = subtitleWrapper.scrollHeight;
+//   }
+//   let origin;
+//   window.addEventListener("message", function (event) {
+//     // console.log('origin', event.origin)
+//     origin = event.origin
+//     const allowedOrigins = [
+//       origin
+//     ];
+//     if (!allowedOrigins.includes(event.origin)) {
+//       console.log('return')
+//       return;
+//     }
+//     const data = event.data;
+//     if (data && data.caption && data.caption.text && data.type === "video-caption") {
+//       const captionText = data.caption.text;
+//       if (captionText && typeof captionText === 'string') {
+//         const p = document.createElement("p");
+//         p.textContent = captionText;
+//         subtitleBox.appendChild(p);
+//         if (autoScroll) {
+//           scrollToBottom();
+//         }
+//       }
+//     }
+//   });
+// }
 function getSubtitle() {
-  const subtitleWrapper = document.getElementById("subtitle-box-wrapper");
-  const subtitleBox = document.getElementById("subtitle-box");
-  let autoScroll = true;
-  subtitleWrapper.addEventListener('mouseenter', () => {
-    autoScroll = false;
-  });
-  subtitleWrapper.addEventListener('mouseleave', () => {
-    autoScroll = true;
-    scrollToBottom();
-  });
-  function scrollToBottom() {
-    subtitleWrapper.scrollTop = subtitleWrapper.scrollHeight;
+  subtitleWrapper.value = document.getElementById("subtitle-box-wrapper");
+  subtitleBox.value = document.getElementById("subtitle-box");
+  subtitleWrapper.value.addEventListener('mouseenter', onMouseEnter);
+  subtitleWrapper.value.addEventListener('mouseleave', onMouseLeave);
+  window.addEventListener("message", onMessage);
+}
+
+const autoScroll = ref(true);
+function scrollToBottom() {
+  if (subtitleWrapper.value) {
+    subtitleWrapper.value.scrollTop = subtitleWrapper.value.scrollHeight;
   }
-  window.addEventListener("message", function (event) {
-    console.log('origin', event.origin)
-    const allowedOrigins = [
-      "https://webcastalpha.vconsol.com"
-    ];
-    if (!allowedOrigins.includes(event.origin)) {
-      console.log('return')
-      return;
-    }
-    const data = event.data;
-    if (data && data.caption && data.caption.text && data.type === "video-caption") {
-      const captionText = data.caption.text;
-      if (captionText && typeof captionText === 'string') {
-        const p = document.createElement("p");
-        p.textContent = captionText;
-        subtitleBox.appendChild(p);
-        if (autoScroll) {
-          scrollToBottom();
-        }
+}
+const onMouseEnter = () => { autoScroll.value = false; };
+const onMouseLeave = () => { autoScroll.value = true; scrollToBottom(); };
+const onMessage = (event: any) => {
+  const origin = event.origin;
+  const allowedOrigins = [origin];
+  if (!allowedOrigins.includes(event.origin)) {
+    return;
+  }
+  const data = event.data;
+  if (data && data.caption && data.caption.text && data.type === "video-caption") {
+    const captionText = data.caption.text;
+    if (captionText && typeof captionText === 'string') {
+      const p = document.createElement("p");
+      p.textContent = captionText;
+      subtitleBox.value.appendChild(p);
+      if (autoScroll.value) {
+        scrollToBottom();
       }
     }
-  });
-}
+  }
+};
 const router = useRouter()
 function changeVideo(item: any) {
   sessionStorage.setItem('tenantId', item.tenant.id)
@@ -192,7 +241,24 @@ const getRelatedVideos = async () => {
   })
   return res;
 }
+const subtitleWrapper = ref<HTMLElement | null>(null);
+const subtitleBox = ref<HTMLElement | null>(null);
+const hostLocation = ref('')
+onUnmounted(() => {
+  if (subtitleBox.value) {
+    subtitleBox.value.innerHTML = "";
+  }
+  if (subtitleWrapper.value) {
+    subtitleBox.value.innerHTML = "";
+    subtitleWrapper.value.removeEventListener('mouseenter', onMouseEnter);
+    subtitleWrapper.value.removeEventListener('mouseleave', onMouseLeave);
+  }
+
+  window.removeEventListener("message", onMessage);
+})
 onMounted(async () => {
+
+  hostLocation.value = encodeURI(window.location.origin)
   tenant.value = sessionStorage.getItem('tenantId') || ''
   if (tenant.value) {
     tenantDetails.value = await getTenant();
@@ -228,6 +294,7 @@ onMounted(async () => {
   if (res) {
     selectedVideo.value = res[0]
     const el = descRef.value;
+    checkOverflow()
   }
   getSubtitle()
 })
@@ -256,7 +323,6 @@ watch(
       if (res && res.length > 0) {
         selectedVideo.value = res[0]
       }
-
       // update related videos
       relatedVideos.value = await getItems({
         collection: 'videos',

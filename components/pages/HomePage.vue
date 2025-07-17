@@ -11,12 +11,10 @@
     <div class="live-videos">
       <h3 class="container-name">Live Videos</h3>
       <div class="show-all-btn" v-if="liveCount > liveVideos?.length && !isShowAllLive" @click="showAllLive()">
-        <img src="@/assets/icons/play.svg" height="10" class="play-button" />
-        Show all
+        Show more
       </div>
       <div class="show-all-btn" v-else-if="isShowAllLive" @click="showAllLive()">
-        <img src="@/assets/icons/play.svg" height="10" class="play-button" />
-        Hide all
+        Show less
       </div>
     </div>
     <div v-if="liveVideos" class="thumbnail">
@@ -29,19 +27,15 @@
       <div v-if="offset > 0 && !isShowAllLive" class="arrow left" @click="prevPage()">
         <img src="~/assets/icons/left-arrow.svg" class="icon" />
       </div>
-      <div class="arrow right" v-if="offset < (totalPages-1) && !isShowAllLive" @click="nextPage()">
+      <div class="arrow right" v-if="offset < (totalPages - 1) && !isShowAllLive" @click="nextPage()">
         <img src="~/assets/icons/right-arrow.svg" class="icon" />
       </div>
     </div>
-    <!-- <div class="divider"></div> -->
+    <div v-if="liveCount >= liveVideos?.length" class="divider"></div>
   </div>
   <div v-if="data?.length > 0" class="live-container other-videos-container">
     <div class="live-videos">
       <h3 class="container-name">Related Videos</h3>
-      <!-- <div class="show-all-btn">
-        <img src="@/assets/icons/play.svg" height="10" class="play-button" />
-        Show all
-      </div> -->
     </div>
     <div class="thumbnail other-videos">
       <client-only>
@@ -63,15 +57,30 @@ const searchTerm = ref('');
 const isSearch = ref(false);
 const { getItems } = useDirectusItems();
 const router = useRouter();
-
+const windowWidth = ref(0)
+const getItemsPerPage = computed(() => {
+  if (windowWidth.value < 600) return 1
+  else if (windowWidth.value < 960) return 2
+  else return 6
+})
+const updateWidth = () => {
+  windowWidth.value = window.innerWidth;
+  offset.value = 0;
+  fetchLiveData()
+}
 onMounted(() => {
+  window.addEventListener('resize', updateWidth)
+  updateWidth()
   fetchData();
   fetchLiveData();
   count();
 })
+onUnmounted(() => {
+  window.removeEventListener('resize', updateWidth)
+})
 const limit = 6;
 const offset = ref(0);
-const page = computed(() => Math.floor(offset.value / limit) + 1)
+const page = computed(() => Math.floor(offset.value / getItemsPerPage.value) + 1)
 const liveVideos: Ref<Record<string, any>[]> = ref([]);
 async function fetchLiveData() {
   const res: Record<string, any>[] = await getItems({
@@ -84,8 +93,8 @@ async function fetchLiveData() {
         'tenant.slug',
         'tenant.logo'
       ],
-      ...(!isShowAllLive.value ? { limit: limit } : {}),
-      ...(!isShowAllLive.value ? { offset: offset.value} : {}),
+      ...(!isShowAllLive.value ? { limit: getItemsPerPage.value } : {}),
+      ...(!isShowAllLive.value ? { offset: offset.value } : {}),
       ...(searchTerm.value ? { search: searchTerm.value } : {}),
       filter: {
         event_type: {
@@ -116,7 +125,7 @@ const count = async () => {
   liveCount.value = liveObj ? Number(liveObj.count) : 0;
 }
 const totalPages = computed(() => {
-  return Math.ceil(liveCount.value / limit);
+  return Math.ceil(liveCount.value / getItemsPerPage.value);
 });
 const data: Ref<Record<string, any>[]> = ref([])
 async function fetchData() {

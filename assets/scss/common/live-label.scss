@@ -19,7 +19,8 @@
     animation: neonPulse 0.5s infinite alternate;
   }
   .live-text {
-    font-weight: 500;
+    font-weight: 400;
+    font-size: .8em;
   }
 }
 @keyframes neonPulse {
@@ -43,8 +44,8 @@
   display: flex; 
   align-items: center; 
   gap:.3em;
-  margin-top: 1%;
-  img{
-    margin-top: .5em;
+  p{    
+    margin-bottom: 0.3em;
+    opacity: 0.3;
   }
 }
