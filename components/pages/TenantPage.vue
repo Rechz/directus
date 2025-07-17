@@ -16,7 +16,7 @@
         </div>
       </div>
       <div class="image-video" v-else>
-        <iframe :src="`${embedUrl(selectedVideo.video_url)}&captionPostToUrl=${hostLocation}`" class="thumbnail-video"
+        <iframe :src="`${embedUrl(selectedVideo.video_url)}&captionPostToUrl=${hostLocation}&scrollingSubtitle=true`" class="thumbnail-video"
           frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
       </div>
       <div class="live-label" v-if="selectedVideo?.event_type === 'live'">
@@ -32,18 +32,19 @@
         </p>
         <div v-else class="live-now-text">
           <img src="@/assets/icons/live.svg" height="15" />
-          <p class="time">Live Now</p>
+          <p class="time">Live Now</p>     
         </div>
+         <!-- <p v-if="selectedVideo.subtitle_show && isClicked">Subtitles</p> -->
         <div v-show="!showSubtitle">
-          <div class="desc" :class="{ 'show-subs': selectedVideo.subtitle_show && isClicked }" ref="descRef"
+          <div class="desc" :class="{ 'show-subs': selectedVideo.subtitle_show && isClicked && showSubtitleButton }" ref="descRef"
             v-html="selectedVideo?.description"></div>
         </div>
         <div v-show="showSubtitle" id="subtitle-box-wrapper" class="desc"
-          :class="{ 'show-subs': selectedVideo.subtitle_show && isClicked }">
+          :class="{ 'show-subs': selectedVideo.subtitle_show && isClicked && showSubtitleButton }">
           <div id="subtitle-box">
           </div>
         </div>
-        <div class="show-subtitle-button" v-if="selectedVideo.subtitle_show && isClicked"
+        <div class="show-subtitle-button" v-if="showSubtitleButton && selectedVideo.subtitle_show && isClicked"
           @click="showSubtitle = !showSubtitle">
           <span><img :src="!showSubtitle ? eyeIcon : eyeHideIcon" height="12" /></span>
           {{ !showSubtitle ? 'Show' : 'Hide' }} Subtitles
@@ -90,46 +91,8 @@ import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import eyeIcon from '~/assets/icons/eye.svg'
 import eyeHideIcon from '~/assets/icons/eye-hide.svg'
+const showSubtitleButton = ref(false)
 dayjs.extend(relativeTime)
-// function getSubtitle() {
-//   const subtitleWrapper = document.getElementById("subtitle-box-wrapper");
-//   const subtitleBox = document.getElementById("subtitle-box");
-//   let autoScroll = true;
-//   subtitleWrapper.addEventListener('mouseenter', () => {
-//     autoScroll = false;
-//   });
-//   subtitleWrapper.addEventListener('mouseleave', () => {
-//     autoScroll = true;
-//     scrollToBottom();
-//   });
-//   function scrollToBottom() {
-//     subtitleWrapper.scrollTop = subtitleWrapper.scrollHeight;
-//   }
-//   let origin;
-//   window.addEventListener("message", function (event) {
-//     // console.log('origin', event.origin)
-//     origin = event.origin
-//     const allowedOrigins = [
-//       origin
-//     ];
-//     if (!allowedOrigins.includes(event.origin)) {
-//       console.log('return')
-//       return;
-//     }
-//     const data = event.data;
-//     if (data && data.caption && data.caption.text && data.type === "video-caption") {
-//       const captionText = data.caption.text;
-//       if (captionText && typeof captionText === 'string') {
-//         const p = document.createElement("p");
-//         p.textContent = captionText;
-//         subtitleBox.appendChild(p);
-//         if (autoScroll) {
-//           scrollToBottom();
-//         }
-//       }
-//     }
-//   });
-// }
 function getSubtitle() {
   subtitleWrapper.value = document.getElementById("subtitle-box-wrapper");
   subtitleBox.value = document.getElementById("subtitle-box");
@@ -154,6 +117,7 @@ const onMessage = (event: any) => {
   }
   const data = event.data;
   if (data && data.caption && data.caption.text && data.type === "video-caption") {
+    showSubtitleButton.value = true
     const captionText = data.caption.text;
     if (captionText && typeof captionText === 'string') {
       const p = document.createElement("p");

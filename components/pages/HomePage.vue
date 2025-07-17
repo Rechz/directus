@@ -4,6 +4,7 @@
       <SearchBar v-model="searchTerm" @search="search"></SearchBar>
     </template>
   </NavBar>
+  <SliderChip @chipSelected="viewData" />
   <div v-if="searchTerm && isSearch" class="search-result">
     <h2>Showing search results for '<em>{{ searchName }}</em>'</h2>
   </div>
@@ -99,7 +100,8 @@ async function fetchLiveData() {
       filter: {
         event_type: {
           _eq: 'live',
-        }
+        },
+        ...(selectedTenant.value ? { tenant: { name: { _eq: selectedTenant.value } } } : {})
       }
     }
   })
@@ -114,20 +116,33 @@ const count = async () => {
     aggregate("videos", {
       aggregate: { count: "*" },
       groupBy: ["event_type"],
-      ...(searchTerm.value ? {
-        query: {
-          search: searchTerm.value
-        }
-      } : {})
-    }
-    ))
+      ...(searchTerm.value || selectedTenant.value
+        ? {
+            query: {
+              ...(searchTerm.value ? { search: searchTerm.value } : {}),
+              ...(selectedTenant.value
+                ? {
+                    filter: {
+                      tenant: {
+                        name: { _eq: selectedTenant.value }
+                      }
+                    }
+                  }
+                : {})
+            }
+          }
+        : {})
+    })
+  );
+
   const liveObj = res.find(item => item.event_type === "live");
   liveCount.value = liveObj ? Number(liveObj.count) : 0;
-}
+};
 const totalPages = computed(() => {
   return Math.ceil(liveCount.value / getItemsPerPage.value);
 });
 const data: Ref<Record<string, any>[]> = ref([])
+const selectedTenant = ref<string | null>(null)
 async function fetchData() {
   const res: Record<string, any>[] = await getItems({
     collection: 'videos',
@@ -143,7 +158,8 @@ async function fetchData() {
       filter: {
         event_type: {
           _neq: 'live',
-        }
+        },
+        ...(selectedTenant.value ? { tenant: { name: { _eq: selectedTenant.value } } } : {}),
       }
     }
   })
@@ -186,5 +202,45 @@ async function showAllLive() {
   isShowAllLive.value = !isShowAllLive.value;
   offset.value = 0;
   fetchLiveData();
+}
+function viewData(option: string) {
+  console.log(option)
+  switch (option) {
+    case 'All': {
+      selectedTenant.value = null
+      offset.value = 0
+      isShowAllLive.value = false
+      fetchData()
+      fetchLiveData()
+    }
+      break
+    case 'Live':
+      {
+        selectedTenant.value = null
+        offset.value = 0
+        isShowAllLive.value = true
+        data.value = []
+        fetchLiveData()
+      }
+      break
+    case 'Related':
+      {
+        selectedTenant.value = null
+        offset.value = 0
+        isShowAllLive.value = false
+        liveVideos.value = [];
+        fetchData()
+      }
+      break
+    default: {
+      selectedTenant.value = option
+      offset.value = 0
+      isShowAllLive.value = false
+      fetchData()
+      count();
+      fetchLiveData()
+    }
+      break
+  }
 }
 </script>
